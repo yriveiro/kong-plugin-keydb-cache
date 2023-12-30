@@ -1,0 +1,51 @@
+_format_version: "3.0"
+plugins:
+  - config:
+      cache:
+        cache_key:
+          vary_headers: null
+          vary_query_params: null
+        methods:
+          - GET
+        status:
+          - 200
+          - 301
+          - 404
+        strategy: cache-control
+        ttl: 30
+      debug: false
+      provider:
+        backend: keydb
+        hosts:
+          - keydb-01:6379
+    enabled: true
+    name: remote-cache
+    protocols:
+      - grpc
+      - grpcs
+      - http
+      - https
+services:
+  - connect_timeout: 60000
+    enabled: true
+    host: httpbin.org
+    name: httpbin
+    port: 80
+    protocol: http
+    read_timeout: 60000
+    retries: 5
+    routes:
+      - https_redirect_status_code: 426
+        name: test
+        path_handling: v0
+        paths:
+          - ~/test/*
+        preserve_host: false
+        protocols:
+          - http
+          - https
+        regex_priority: 0
+        request_buffering: true
+        response_buffering: true
+        strip_path: true
+    write_timeout: 60000

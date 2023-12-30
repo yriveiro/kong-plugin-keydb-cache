@@ -1,0 +1,33 @@
+{
+  "$schema": "https://raw.githubusercontent.com/sumneko/vscode-lua/master/setting/schema.json",
+  "Lua.workspace.checkThirdParty": "Apply",
+  "Lua.workspace.library": [
+    "${3rd}/OpenResty/library",
+    "/Users/yriveiro/Development/github/kong/kong",
+    "${3rd}/lfs/library"
+  ],
+  "Lua.workspace.userThirdParty": ["/Users/yriveiro/Development/github/kong"],
+  "Lua.diagnostics.globals": [
+    "_KONG",
+    "describe",
+    "it",
+    "kong",
+    "lazy_each",
+    "lazy_setup",
+    "lazy_teardown",
+    "ngx",
+    "ngx.IS_CLI",
+    "assert",
+    "lfs",
+    "before_each",
+    "after_each"
+  ],
+  "Lua.workspace.maxPreload": 50000,
+  "Lua.workspace.preloadFileSize": 1024,
+  "Lua.intelliSense": {
+    "enable": true,
+    "globals": ["kong", "ngx"]
+  },
+  "Lua.runtime.version": "LuaJIT",
+  "diagnostics.disable": ["undefined-field"]
+}
