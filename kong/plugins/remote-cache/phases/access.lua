@@ -102,6 +102,8 @@ function M.execute(config)
     return
   end
 
+  kong.log.inspect(response_cache)
+
   if response_cache and http:stale(cache_control, response_cache.timestamp, response_cache.ttl) then
     miss(ctx.cache_key)
     return

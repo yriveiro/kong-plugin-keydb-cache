@@ -7,6 +7,7 @@ local parse_http_time = ngx.parse_http_time
 local time = ngx.time
 local tostring = tostring
 local type = type
+local warn = kong.log.warn
 
 ---@class HTTTP
 local M = {}
@@ -49,6 +50,12 @@ function M:only_if_cached(cache_control)
   return headers:has_directive(cache_control, 'only-if-cached', true)
 end
 
+-- Check if the response is stale.
+--
+---@param cache_control any
+---@param age any
+---@param ttl any
+---@return boolean
 function M:stale(cache_control, age, ttl)
   if cache_control then
     if headers:has_directive(cache_control, 'max-age', true) then
@@ -76,7 +83,7 @@ function M:stale(cache_control, age, ttl)
     end
   end
 
-  if ttl <= 0 then
+  if ttl ~= nil and ttl <= 0 then
     return true
   end
 
@@ -84,8 +91,7 @@ function M:stale(cache_control, age, ttl)
 end
 
 -- Retrieves the TTL for the response, it use the cache_control *max-age* and
--- *s-maxage* directives first. I none is present will try to fallback to the
--- *Expire* header, if multiple entries of *Expire* are pass, the last one wings.
+-- *s-maxage* directives first. I none is present will return 0.
 --
 ---@param cache_control string Content of the cache-control header directive.
 ---@return integer ttl value in seconds.
@@ -101,8 +107,17 @@ function M:ttl(cache_control)
     end
   end
 
+  return max(ttl, 0)
+end
+
+-- Check if the response is expared based in *Expires* header
+-- if multiple entries of *Expire* are pass, the last one wings.
+--
+---@return boolean
+function M:expired()
   -- If not max age directive found, use expires header if exits.
   local expires = get_headers()['expires']
+  local ttl = -1
 
   if expires then
     -- Last expire from the table wins
@@ -112,12 +127,15 @@ function M:ttl(cache_control)
 
     local timestamp = parse_http_time(tostring(expires))
 
-    if timestamp then
-      ttl = timestamp - time()
+    if not timestamp then
+      warn('parse_http_time returned nil, unsupported expire format', expires)
+      return false
     end
+
+    ttl = timestamp - time()
   end
 
-  return max(ttl, 0)
+  return ttl <= 0
 end
 
 return M

@@ -163,7 +163,7 @@ function M:set(key, payload, ttl)
     return nil
   end
 
-  return self.provider:et(key, payload, ttl or nil)
+  return self.provider:set(key, payload, ttl or nil)
 end
 
 return M

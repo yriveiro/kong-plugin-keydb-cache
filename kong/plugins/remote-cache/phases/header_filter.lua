@@ -41,20 +41,30 @@ function M.execute(config)
     return
   end
 
-  -- Check is response is cacheable.
-  if cache_control then
-    if type(cache_control) == 'table' then
-      cache_control = concat(cache_control, ', ')
-    end
+  if config.cache.strategy == const.STRATEGY.CACHE_CONTROL then
+    -- Check is response is cacheable.
+    if cache_control then
+      if type(cache_control) == 'table' then
+        cache_control = concat(cache_control, ', ')
+      end
 
-    if http:no_cache(cache_control, 'response') then
-      bypass()
-      return
+      if http:no_cache(cache_control, 'response') then
+        bypass()
+        return
+      end
     end
   end
 
+  if config.cache.strategy == const.STRATEGY.EXPIRED then
+  end
+
+  if config.cache.strategy == const.STRATEGY.TTL then
+  end
+
   -- Calculate ttl for body_filter phase inject it on cache provider set operation.
+  -- if the TTL from cache control is zero, use the configured fallback.
   local ttl = http:ttl(cache_control)
+
   ctx.ttl = ttl > 0 and ttl or config.cache.ttl
   ctx.response_headers = header:filter_headers(get_headers(), { const.HEADERS.CACHE_STATUS })
 end

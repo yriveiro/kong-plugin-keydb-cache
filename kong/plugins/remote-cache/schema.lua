@@ -45,19 +45,20 @@ local schema = {
                 },
                 {
                   ttl = {
-                    description = 'If no cache control directive is set, the max time in seconds before the entry is garbage collected.',
+                    description = 'If ttl strategy is selected, the max time in seconds before the entry is garbage collected.',
                     default = 30,
                     type = 'integer',
                   },
                 },
                 {
                   strategy = {
-                    description = 'Cache strategy, valid values are `cache-control` or `custom`.',
+                    description = 'Cache strategy, valid values are `cache-control`, `expired` or `ttl`.',
                     type = 'string',
                     default = 'cache-control',
                     one_of = {
                       'cache-control',
-                      'custom',
+                      'expired',
+                      'ttl',
                     },
                   },
                 },
